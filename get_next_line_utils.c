@@ -1,18 +1,18 @@
 #include "get_next_line.h"
 
-size_t		ft_strlen(const char *str)
+size_t	ft_strlen(const char *str)
 {
 	size_t	i;
 
 	i = 0;
-	if(!str)
-		return(0);
+	if (!str)
+		return (0);
 	while (str[i])
 		i++;
 	return (i);
 }
 
-char		*ft_strjoin(char *s1, char *s2, char **s3)
+char	*ft_strjoin(char *s1, char *s2, char **s3, int *ret)
 {
 	size_t	n;
 	size_t	m;
@@ -23,7 +23,10 @@ char		*ft_strjoin(char *s1, char *s2, char **s3)
 	m = ft_strlen(s2);
 	pointer = (char *)malloc(sizeof(char) * (m + n + 1));
 	if (pointer == NULL)
+	{
+		*ret = -1;
 		return (NULL);
+	}
 	rez = pointer;
 	while (s1 && (*s1 != '\0'))
 		*pointer++ = *s1++;
@@ -38,34 +41,41 @@ char		*ft_strjoin(char *s1, char *s2, char **s3)
 	return (rez);
 }
 
-int			buf_check(char *buf)// ищем символ слеш н и затираем его нуль символом
+int	N_in_buf(char *buf)
 {
-	int	i;
+	int		i;
+	char	*pointer;
 
 	i = 0;
-	while (buf[i] != '\0' && buf[i] != '\n')
+	pointer = buf;
+	while (*pointer != '\0' && *pointer != '\n')
+	{
+		pointer++;
 		i++;
+	}
 	buf[i] = '\0';
 	return (i);
 }
 
-int	remains_n(char **remains, char **line)//работа со статическим воспоминанием
+int	memory_of_brain(char **brain, char **line)
 {
 	int	i;
-	int	len;
+	int	n;
+	int	ret;
 
 	i = 0;
-	if (*remains == NULL)
-		return (0);
-	len = ft_strlen(*remains);
-	while ((*remains)[i] != '\0' && (*remains)[i] != '\n')
+	ret = 0;
+	if (*brain == NULL)
+		return (ret);
+	n = ft_strlen(*brain);
+	while ((*brain)[i] != '\0' && (*brain)[i] != '\n')
 		i++;
-	if (i < len)//вариант остановки,когда наткнулись на слеш н
+	if (i != n)
 	{
-		(*remains)[i] = '\0';
-		*line = ft_strjoin(NULL, *remains, NULL);//запихиваем в линию статическую переменную
-		*remains = ft_strjoin(NULL, (*remains) + i + 1, remains);//затираем старую статич перемен и записываем со слеш нуля ремайнс
-		return (1);//еденица если есть слеш н
+		ret = 1;
+		(*brain)[i] = '\0';
+		*line = ft_strjoin(NULL, *brain, NULL, &ret);
+		*brain = ft_strjoin(NULL, (*brain) + i + 1, brain, &ret);
 	}
-	return (0);
+	return (ret);
 }
